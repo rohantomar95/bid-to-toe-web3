@@ -200,12 +200,11 @@ const Index = () => {
           setGameStatus("playing");
           
           const otherAgent = agents.find(agent => agent.id !== winner!.id);
-          addLog(`${winner.name} won the bid with $${bids[winner.id]} vs $${otherAgent ? bids[otherAgent.id] : 0}`, "bid");
-          setStatusMessage(`${winner.name} won the bidding rights for $${bids[winner.id]}`);
+          const bidMessage = `${winner.name} won the bid with $${bids[winner.id]} vs $${otherAgent ? bids[otherAgent.id] : 0}`;
+          addLog(bidMessage, "bid");
+          setStatusMessage(bidMessage);
           
-          toast(`${winner.name} won the bid!`, {
-            description: `Bid amount: $${bids[winner.id]}`,
-          });
+          // Remove toast notification for bid winner
         }
       }
     }, 1500);
@@ -223,8 +222,11 @@ const Index = () => {
         setGameStatus("gameOver");
         
         if (winnerAgent) {
-          addLog(`${winnerAgent.name} wins with a line of three!`, "system");
-          toast(`${winnerAgent.name} wins with a line of three!`, {
+          const winMessage = `${winnerAgent.name} wins with a line of three!`;
+          addLog(winMessage, "system");
+          setStatusMessage(winMessage);
+          // Keep toast only for game over
+          toast(`${winnerAgent.name} wins the game!`, {
             description: "Game over",
           });
         }
@@ -241,15 +243,21 @@ const Index = () => {
         setWinner(sortedAgents[0]);
         setWinReason("money");
         setGameStatus("gameOver");
-        addLog(`${sortedAgents[0].name} wins with more money! ($${sortedAgents[0].money})`, "system");
-        toast(`${sortedAgents[0].name} wins with more money!`, {
-          description: `Remaining: $${sortedAgents[0].money}`,
+        const winMessage = `${sortedAgents[0].name} wins with more money! ($${sortedAgents[0].money})`;
+        addLog(winMessage, "system");
+        setStatusMessage(winMessage);
+        // Keep toast only for game over
+        toast(`${sortedAgents[0].name} wins the game!`, {
+          description: "With more remaining funds",
         });
       } else if (sortedAgents[0].money === sortedAgents[1].money) {
         // It's a tie
         setGameStatus("gameOver");
-        addLog("It's a tie! Both agents have the same amount of money.", "system");
-        toast("It's a tie! Both agents have the same amount of money.", {
+        const tieMessage = "It's a tie! Both agents have the same amount of money.";
+        addLog(tieMessage, "system");
+        setStatusMessage(tieMessage);
+        // Keep toast only for game over
+        toast("It's a tie!", {
           description: "Game over",
         });
       }
@@ -265,9 +273,12 @@ const Index = () => {
         setWinner(winnerAgent);
         setWinReason("bankrupt");
         setGameStatus("gameOver");
-        addLog(`${winnerAgent.name} wins by bankrupting opponent!`, "system");
-        toast(`${winnerAgent.name} wins by bankrupting opponent!`, {
-          description: "Game over",
+        const winMessage = `${winnerAgent.name} wins by bankrupting opponent!`;
+        addLog(winMessage, "system");
+        setStatusMessage(winMessage);
+        // Keep toast only for game over
+        toast(`${winnerAgent.name} wins the game!`, {
+          description: "Opponent bankrupted",
         });
       }
       return;
@@ -344,13 +355,7 @@ const Index = () => {
           
           {/* Rules Button */}
           <div className="mt-4">
-            <Button 
-              onClick={() => setRulesOpen(true)} 
-              variant="outline" 
-              className="bg-slate-800 border-teal-500/30 hover:bg-teal-500/20"
-            >
-              <Book className="w-4 h-4 mr-2" /> Game Rules
-            </Button>
+            <GameControls onShowRules={() => setRulesOpen(true)} />
           </div>
         </header>
 
