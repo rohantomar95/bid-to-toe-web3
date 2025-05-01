@@ -5,19 +5,13 @@ import { AgentType } from "./AIAgent";
 
 interface GameBoardProps {
   currentPlayer: AgentType | null;
-  onCellClick?: (index: number) => void;
   board: (string | null)[];
   winningCombination: number[] | null;
   disabled: boolean;
 }
 
-const GameBoard = ({ currentPlayer, onCellClick, board, winningCombination, disabled }: GameBoardProps) => {
+const GameBoard = ({ currentPlayer, board, winningCombination, disabled }: GameBoardProps) => {
   const [hoveredCell, setHoveredCell] = useState<number | null>(null);
-
-  const handleCellClick = (index: number) => {
-    if (disabled || board[index]) return;
-    onCellClick?.(index);
-  };
 
   const renderCell = (index: number) => {
     const isWinningCell = winningCombination?.includes(index);
@@ -29,9 +23,8 @@ const GameBoard = ({ currentPlayer, onCellClick, board, winningCombination, disa
         key={index}
         className={`game-cell aspect-square flex items-center justify-center transition-all duration-300
                    ${isWinningCell ? "bg-cyber-purple/30 cyber-glow" : "bg-cyber-gray/30"} 
-                   ${disabled ? "cursor-not-allowed" : ""}
+                   ${disabled ? "cursor-not-allowed" : "cursor-default"}
                    border border-cyber-purple/20`}
-        onClick={() => handleCellClick(index)}
         onMouseEnter={() => setHoveredCell(index)}
         onMouseLeave={() => setHoveredCell(null)}
       >

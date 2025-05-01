@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { DollarSign } from "lucide-react";
+import { DollarSign, Sparkles } from "lucide-react";
 import { AgentType } from "./AIAgent";
 import { toast } from "sonner";
 
@@ -9,6 +9,7 @@ interface BiddingSystemProps {
   agents: AgentType[];
   onBidComplete: (agentId: string, winningBid: number) => void;
   disabled: boolean;
+  autoStart?: boolean;
 }
 
 // Generate a random bid between min and max (inclusive)
@@ -29,11 +30,22 @@ const generateRandomBid = (agent: AgentType, min: number = 1) => {
   return bid;
 };
 
-const BiddingSystem = ({ agents, onBidComplete, disabled }: BiddingSystemProps) => {
+// Bidding system messages for more dynamic commentary
+const BIDDING_MESSAGES = [
+  "Agents calculating optimal bids...",
+  "Quantum algorithms processing bid values...",
+  "Neural networks evaluating board positions...",
+  "Blockchain validators confirming bids...",
+  "AI agents preparing their strategies...",
+  "Bidding protocols initializing...",
+];
+
+const BiddingSystem = ({ agents, onBidComplete, disabled, autoStart = false }: BiddingSystemProps) => {
   const [isBidding, setIsBidding] = useState(false);
   const [bids, setBids] = useState<{[key: string]: number | null}>({});
   const [showResults, setShowResults] = useState(false);
   const [tiedBid, setTiedBid] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("Waiting for bids...");
 
   useEffect(() => {
     if (!disabled) {
@@ -46,13 +58,24 @@ const BiddingSystem = ({ agents, onBidComplete, disabled }: BiddingSystemProps) 
       setBids(initialBids);
       setShowResults(false);
       setTiedBid(false);
+      
+      // Auto-start bidding if enabled
+      if (autoStart && !isBidding) {
+        const timer = setTimeout(() => {
+          startBidding();
+        }, 1000); // Slight delay before auto-starting
+        return () => clearTimeout(timer);
+      }
     }
-  }, [disabled, agents]);
+  }, [disabled, agents, autoStart]);
 
   const startBidding = () => {
-    if (disabled) return;
+    if (disabled || isBidding) return;
     
     setIsBidding(true);
+    
+    // Show a random message for more interesting commentary
+    setStatusMessage(BIDDING_MESSAGES[Math.floor(Math.random() * BIDDING_MESSAGES.length)]);
     
     // Generate bids for both agents
     const newBids = { ...bids };
@@ -69,6 +92,7 @@ const BiddingSystem = ({ agents, onBidComplete, disabled }: BiddingSystemProps) 
       // Check for tied bids
       if (agents.length === 2 && newBids[agents[0].id] === newBids[agents[1].id]) {
         setTiedBid(true);
+        setStatusMessage("Bids are tied! Rebidding required...");
         toast("Bids are tied! Both agents must rebid.", {
           description: "No money will be lost in this tie."
         });
@@ -83,16 +107,31 @@ const BiddingSystem = ({ agents, onBidComplete, disabled }: BiddingSystemProps) 
         const winner = sortedAgents[0];
         const winningBid = newBids[winner.id] || 0;
         
+        setStatusMessage(`${winner.name} wins the bidding round!`);
+        
         setTimeout(() => {
           onBidComplete(winner.id, winningBid);
-        }, 1500);
+        }, 1200);
       }
-    }, 1200); // Simulate thinking delay
+    }, 1500); // Simulate thinking delay
   };
 
   return (
     <div className="cyber-panel p-6 w-full">
-      <h3 className="cyber-text text-xl mb-6 text-center">Bidding Round</h3>
+      <h3 className="cyber-text text-xl mb-4 text-center flex items-center justify-center">
+        <Sparkles className="w-5 h-5 mr-2 text-cyber-purple" />
+        Bidding Round
+      </h3>
+      
+      {showResults ? (
+        <div className="text-center text-cyber-blue mb-4 animate-fade-in">
+          {statusMessage}
+        </div>
+      ) : isBidding ? (
+        <div className="text-center text-cyber-purple mb-4 animate-pulse">
+          {statusMessage}
+        </div>
+      ) : null}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {agents.map(agent => (
@@ -117,19 +156,33 @@ const BiddingSystem = ({ agents, onBidComplete, disabled }: BiddingSystemProps) 
         ))}
       </div>
 
-      <div className="flex justify-center">
-        <Button 
-          onClick={startBidding} 
-          disabled={isBidding || disabled || (tiedBid && !showResults)}
-          className={`cyber-button ${isBidding ? 'animate-pulse' : ''}`}
-        >
-          {tiedBid && showResults 
-            ? "Rebid (Tied)" 
-            : showResults 
-              ? "Next Round" 
-              : "Start Bidding Round"}
-        </Button>
-      </div>
+      {!autoStart && (
+        <div className="flex justify-center">
+          <Button 
+            onClick={startBidding} 
+            disabled={isBidding || disabled || (tiedBid && !showResults)}
+            className={`cyber-button ${isBidding ? 'animate-pulse' : ''}`}
+          >
+            {tiedBid && showResults 
+              ? "Rebid (Tied)" 
+              : showResults 
+                ? "Next Round" 
+                : "Start Bidding Round"}
+          </Button>
+        </div>
+      )}
+      
+      {autoStart && tiedBid && showResults && (
+        <div className="flex justify-center">
+          <Button 
+            onClick={startBidding} 
+            disabled={isBidding}
+            className="cyber-button animate-pulse"
+          >
+            Rebid (Tied)
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
