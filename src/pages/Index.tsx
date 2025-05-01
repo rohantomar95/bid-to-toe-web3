@@ -5,9 +5,8 @@ import GameControls from "@/components/GameControls";
 import GameStatus from "@/components/GameStatus";
 import GameRules from "@/components/GameRules";
 import { toast } from "sonner";
-import { MessageSquare, Book } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 // Winning combinations on the board
@@ -353,7 +352,7 @@ const Index = () => {
           </h1>
           <p className="text-muted-foreground text-lg">Web3 AI Agent Battle Arena</p>
           
-          {/* Rules Button */}
+          {/* Rules Button moved up in the layout */}
           <div className="mt-4">
             <GameControls onShowRules={() => setRulesOpen(true)} />
           </div>
@@ -416,16 +415,6 @@ const Index = () => {
                 winningCombination={winningCombination}
                 disabled={gameStatus !== "playing"}
               />
-
-              <div className="mt-4">
-                <Button 
-                  onClick={handleNewGame} 
-                  variant="outline" 
-                  className="bg-slate-800 border-teal-500/30 hover:bg-teal-500/20"
-                >
-                  New Game
-                </Button>
-              </div>
             </div>
 
             <div className="lg:col-span-3 order-3">
