@@ -20,17 +20,22 @@ interface AIAgentProps {
 }
 
 const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) => {
-  const statusColor = isActive ? "bg-cyber-purple" : "bg-muted";
+  const statusColor = isActive ? "bg-teal-500" : "bg-muted";
   const bidWinnerStyle = isBidWinner === true 
     ? "cyber-border animate-pulse-glow" 
     : isBidWinner === false 
       ? "opacity-70" 
       : "";
 
+  const getProgressColor = () => {
+    if (agent.money <= 20) return "bg-amber-500";
+    return "bg-teal-500";
+  };
+
   return (
     <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle}`}>
       <div className="relative mb-3">
-        <Avatar className="w-20 h-20 border-2 border-cyber-purple/50">
+        <Avatar className="w-20 h-20 border-2 border-teal-500/50">
           <img 
             src={agent.avatar} 
             alt={agent.name}
@@ -47,8 +52,8 @@ const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) =>
         <div className="flex justify-between mb-1">
           <span className="text-sm text-muted-foreground">Balance</span>
           <span className="cyber-text flex items-center">
-            <DollarSign className="w-4 h-4 mr-1 text-cyber-green" />
-            <span className={`${agent.money <= 20 ? "text-cyber-red" : "text-cyber-green"}`}>
+            <DollarSign className="w-4 h-4 mr-1 text-teal-500" />
+            <span className={`${agent.money <= 20 ? "text-amber-500" : "text-teal-400"}`}>
               {agent.money}
             </span>
           </span>
@@ -56,17 +61,19 @@ const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) =>
         <Progress 
           value={agent.money} 
           max={100} 
-          className="h-2 bg-muted"
-          indicatorClassName={`${agent.money <= 20 ? "bg-cyber-red" : "bg-cyber-green"}`}
+          className="h-2 bg-slate-800"
+          style={{
+            "--progress-background": getProgressColor()
+          } as React.CSSProperties}
         />
       </div>
 
-      {showLastBid && agent.lastBid !== null && (
+      {agent.lastBid !== null && (
         <div className="cyber-border rounded-md px-4 py-2 text-center w-full">
           <div className="text-sm text-muted-foreground">Last bid</div>
           <div className="cyber-text text-lg flex items-center justify-center">
             <DollarSign className="w-4 h-4 mr-1" />
-            <span className={`${isBidWinner ? "text-cyber-green" : "text-cyber-red"}`}>
+            <span className={`${isBidWinner ? "text-teal-400" : "text-amber-500"}`}>
               {agent.lastBid}
             </span>
           </div>

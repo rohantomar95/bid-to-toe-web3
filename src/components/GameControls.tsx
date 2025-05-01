@@ -25,15 +25,15 @@ const GameControls = ({ onNewGame, onShowRules }: GameControlsProps) => {
 
   return (
     <div className="flex flex-col sm:flex-row gap-3">
-      <Button onClick={onShowRules} variant="outline" className="bg-cyber-gray border-cyber-purple/30 hover:bg-cyber-purple/20">
+      <Button onClick={onShowRules} variant="outline" className="bg-slate-800 border-teal-500/30 hover:bg-teal-500/20">
         Game Rules
       </Button>
-      <Button onClick={() => setResetDialogOpen(true)} variant="outline" className="bg-cyber-gray border-cyber-purple/30 hover:bg-cyber-purple/20">
+      <Button onClick={() => setResetDialogOpen(true)} variant="outline" className="bg-slate-800 border-teal-500/30 hover:bg-teal-500/20">
         New Game
       </Button>
 
       <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-        <DialogContent className="cyber-panel border-cyber-purple/40">
+        <DialogContent className="cyber-panel border-teal-500/40">
           <DialogHeader>
             <DialogTitle>Reset Game</DialogTitle>
             <DialogDescription>
@@ -44,7 +44,7 @@ const GameControls = ({ onNewGame, onShowRules }: GameControlsProps) => {
             <Button variant="outline" onClick={() => setResetDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleReset} className="bg-cyber-purple hover:bg-cyber-light-purple">
+            <Button onClick={handleReset} className="bg-teal-500 hover:bg-teal-400">
               New Game
             </Button>
           </DialogFooter>

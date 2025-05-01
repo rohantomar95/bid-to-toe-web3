@@ -14,7 +14,7 @@
     --popover: 226 29% 14%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 252 73% 74%;
+    --primary: 173 80% 40%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 196 78% 49%;
@@ -23,7 +23,7 @@
     --muted: 228 16% 20%;
     --muted-foreground: 0 0% 80%;
 
-    --accent: 196 78% 49%;
+    --accent: 173 80% 40%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -31,7 +31,7 @@
 
     --border: 228 16% 24%;
     --input: 228 16% 24%;
-    --ring: 252 73% 74%;
+    --ring: 173 80% 40%;
 
     --radius: 0.75rem;
   }
@@ -43,42 +43,42 @@
   }
 
   body {
-    @apply bg-cyber-dark text-foreground;
+    @apply bg-slate-900 text-foreground;
     background-image: 
-      radial-gradient(circle at 10% 10%, rgba(155, 135, 245, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 90% 90%, rgba(30, 174, 219, 0.05) 0%, transparent 50%);
+      radial-gradient(circle at 10% 10%, rgba(20, 184, 166, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 90% 90%, rgba(45, 212, 191, 0.05) 0%, transparent 50%);
     min-height: 100vh;
   }
   
   .cyber-panel {
-    @apply bg-cyber-gray rounded-md border border-cyber-purple/30 shadow-lg backdrop-blur-sm;
-    box-shadow: 0 0 10px rgba(155, 135, 245, 0.1), 
-                inset 0 0 15px rgba(155, 135, 245, 0.05);
+    @apply bg-slate-800/80 rounded-md border border-teal-500/30 shadow-lg backdrop-blur-sm;
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.1), 
+                inset 0 0 15px rgba(20, 184, 166, 0.05);
   }
   
   .cyber-text {
     @apply font-medium tracking-wide;
-    text-shadow: 0 0 10px rgba(155, 135, 245, 0.5);
+    text-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
   }
   
   .cyber-glow {
-    box-shadow: 0 0 15px rgba(155, 135, 245, 0.5);
+    box-shadow: 0 0 15px rgba(20, 184, 166, 0.5);
   }
   
   .cyber-border {
-    @apply border border-cyber-purple/30;
-    box-shadow: 0 0 10px rgba(155, 135, 245, 0.2), 
-                inset 0 0 5px rgba(155, 135, 245, 0.1);
+    @apply border border-teal-500/30;
+    box-shadow: 0 0 10px rgba(20, 184, 166, 0.2), 
+                inset 0 0 5px rgba(20, 184, 166, 0.1);
   }
   
   .game-cell {
-    @apply transition-all duration-300 cursor-pointer hover:bg-cyber-purple/20 relative overflow-hidden;
+    @apply transition-all duration-300 cursor-pointer hover:bg-teal-500/20 relative overflow-hidden;
   }
   
   .game-cell::before {
     content: '';
     @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-    background: radial-gradient(circle, rgba(155, 135, 245, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.2) 0%, transparent 70%);
   }
   
   .game-cell:hover::before {
@@ -87,7 +87,7 @@
   
   .cyber-button {
     @apply relative overflow-hidden rounded-lg px-6 py-3 transition-all duration-300
-    bg-cyber-purple hover:bg-cyber-light-purple text-white font-bold uppercase tracking-wide
+    bg-teal-500 hover:bg-teal-400 text-white font-bold uppercase tracking-wide
     shadow-lg hover:shadow-xl hover:-translate-y-1;
   }
   
@@ -101,13 +101,41 @@
     @apply opacity-100;
     animation: shine 1.5s infinite;
   }
-  
+
   @keyframes shine {
     0% {
       left: -100%;
     }
     100% {
       left: 100%;
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(20, 184, 166, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(20, 184, 166, 0.8);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }

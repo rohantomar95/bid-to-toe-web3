@@ -18,16 +18,16 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message }:
   
   if (status === "bidding") {
     statusText = "Bidding Phase";
-    statusClass += " text-cyber-purple";
-    statusIcon = <DollarSign className="w-6 h-6 inline-block mr-2 text-cyber-purple animate-pulse" />;
+    statusClass += " text-teal-500";
+    statusIcon = <DollarSign className="w-6 h-6 inline-block mr-2 text-teal-500 animate-pulse" />;
   } else if (status === "playing") {
     statusText = `Turn ${turn} - ${currentPlayer?.name}'s Move`;
-    statusClass += " text-cyber-blue";
-    statusIcon = <Zap className="w-6 h-6 inline-block mr-2 text-cyber-blue" />;
+    statusClass += " text-teal-400";
+    statusIcon = <Zap className="w-6 h-6 inline-block mr-2 text-teal-400" />;
   } else if (status === "gameOver" && winner) {
     statusText = `${winner.name} Wins!`;
-    statusClass += " text-cyber-green font-bold text-2xl";
-    statusIcon = <Trophy className="w-6 h-6 inline-block mr-2 text-cyber-green" />;
+    statusClass += " text-teal-300 font-bold text-2xl";
+    statusIcon = <Trophy className="w-6 h-6 inline-block mr-2 text-teal-300" />;
   }
   
   return (
@@ -38,7 +38,7 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message }:
       </h2>
       
       {message && (
-        <div className="mt-1 text-cyber-blue/80 animate-fade-in">
+        <div className="mt-1 text-teal-300/80 animate-fade-in">
           {message}
         </div>
       )}
