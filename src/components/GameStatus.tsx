@@ -1,6 +1,7 @@
 
 import { AgentType } from "./AIAgent";
 import { Trophy, Zap, DollarSign, AlertTriangle } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface GameStatusProps {
   status: "bidding" | "playing" | "gameOver";
@@ -15,6 +16,7 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message }:
   let statusText = "";
   let statusClass = "text-xl cyber-text";
   let statusIcon = null;
+  const isMobile = useIsMobile();
   
   if (status === "bidding") {
     statusText = "Bidding Phase";
@@ -30,6 +32,10 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message }:
     statusIcon = <Trophy className="w-6 h-6 inline-block mr-2 text-teal-300" />;
   }
   
+  if (isMobile) {
+    statusClass = statusClass.replace("text-xl", "text-lg").replace("text-2xl", "text-xl");
+  }
+  
   return (
     <div className="text-center mb-4">
       <h2 className={statusClass}>
@@ -38,13 +44,13 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message }:
       </h2>
       
       {message && (
-        <div className="mt-1 text-teal-300/80 animate-fade-in">
+        <div className={`mt-1 text-teal-300/80 animate-fade-in ${isMobile ? 'text-sm' : ''}`}>
           {message}
         </div>
       )}
       
       {status === "gameOver" && winner && winReason && (
-        <div className="mt-2 text-muted-foreground animate-fade-in">
+        <div className={`mt-2 text-muted-foreground animate-fade-in ${isMobile ? 'text-xs' : ''}`}>
           {winReason === "pattern" && "Victory by completing a line!"}
           {winReason === "money" && "Victory with more remaining funds!"}
           {winReason === "bankrupt" && "Victory by bankrupting opponent!"}

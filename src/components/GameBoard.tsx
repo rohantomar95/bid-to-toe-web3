@@ -1,7 +1,8 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Circle } from "lucide-react";
 import { AgentType } from "./AIAgent";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface GameBoardProps {
   currentPlayer: AgentType | null;
@@ -13,6 +14,7 @@ interface GameBoardProps {
 
 const GameBoard = ({ currentPlayer, board, winningCombination, disabled, onCellClick }: GameBoardProps) => {
   const [hoveredCell, setHoveredCell] = useState<number | null>(null);
+  const isMobile = useIsMobile();
 
   const handleClick = (index: number) => {
     if (onCellClick && !disabled && !board[index]) {
@@ -37,17 +39,17 @@ const GameBoard = ({ currentPlayer, board, winningCombination, disabled, onCellC
         onClick={() => handleClick(index)}
       >
         {content === "X" && (
-          <X className={`w-12 h-12 text-teal-500 ${isWinningCell ? "animate-pulse" : ""}`} />
+          <X className={`${isMobile ? 'w-8 h-8' : 'w-12 h-12'} text-teal-500 ${isWinningCell ? "animate-pulse" : ""}`} />
         )}
         {content === "O" && (
-          <Circle className={`w-12 h-12 text-teal-300 ${isWinningCell ? "animate-pulse" : ""}`} />
+          <Circle className={`${isMobile ? 'w-8 h-8' : 'w-12 h-12'} text-teal-300 ${isWinningCell ? "animate-pulse" : ""}`} />
         )}
         {showPreview && (
           <div className="opacity-30">
             {currentPlayer.mark === "X" ? (
-              <X className="w-12 h-12 text-teal-500" />
+              <X className={`${isMobile ? 'w-8 h-8' : 'w-12 h-12'} text-teal-500`} />
             ) : (
-              <Circle className="w-12 h-12 text-teal-300" />
+              <Circle className={`${isMobile ? 'w-8 h-8' : 'w-12 h-12'} text-teal-300`} />
             )}
           </div>
         )}
@@ -56,7 +58,7 @@ const GameBoard = ({ currentPlayer, board, winningCombination, disabled, onCellC
   };
 
   return (
-    <div className="cyber-panel p-4 w-full max-w-md">
+    <div className={`cyber-panel p-4 w-full ${isMobile ? 'max-w-xs' : 'max-w-md'}`}>
       <div className="grid grid-cols-3 gap-2">
         {Array(9).fill(null).map((_, index) => renderCell(index))}
       </div>

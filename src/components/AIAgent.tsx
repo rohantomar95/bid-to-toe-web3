@@ -2,6 +2,7 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { DollarSign } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export type AgentType = {
   id: string;
@@ -20,6 +21,7 @@ interface AIAgentProps {
 }
 
 const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) => {
+  const isMobile = useIsMobile();
   const statusColor = isActive ? "bg-teal-500" : "bg-muted";
   const bidWinnerStyle = isBidWinner === true 
     ? "cyber-border animate-pulse-glow" 
@@ -34,8 +36,8 @@ const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) =>
 
   return (
     <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle}`}>
-      <div className="relative mb-3">
-        <Avatar className="w-20 h-20 border-2 border-teal-500/50">
+      <div className="relative mb-2">
+        <Avatar className={`${isMobile ? 'w-14 h-14' : 'w-20 h-20'} border-2 border-teal-500/50`}>
           <img 
             src={agent.avatar} 
             alt={agent.name}
@@ -45,10 +47,10 @@ const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) =>
         <div className={`absolute top-0 right-0 w-4 h-4 rounded-full ${statusColor} border border-white`}></div>
       </div>
 
-      <h3 className="cyber-text text-xl font-bold text-center mb-1">{agent.name}</h3>
-      <div className="text-sm text-muted-foreground mb-4">Agent {agent.mark}</div>
+      <h3 className={`cyber-text ${isMobile ? 'text-lg' : 'text-xl'} font-bold text-center mb-1`}>{agent.name}</h3>
+      <div className="text-sm text-muted-foreground mb-2">Agent {agent.mark}</div>
 
-      <div className="w-full mb-4">
+      <div className="w-full mb-3">
         <div className="flex justify-between mb-1">
           <span className="text-sm text-muted-foreground">Balance</span>
           <span className="cyber-text flex items-center">
@@ -69,8 +71,8 @@ const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) =>
       </div>
 
       {agent.lastBid !== null && (
-        <div className="cyber-border rounded-md px-4 py-2 text-center w-full">
-          <div className="text-sm text-muted-foreground">Last bid</div>
+        <div className="cyber-border rounded-md px-3 py-2 text-center w-full">
+          <div className={`text-sm text-muted-foreground ${isMobile ? 'hidden' : 'block'}`}>Last bid</div>
           <div className="cyber-text text-lg flex items-center justify-center">
             <DollarSign className="w-4 h-4 mr-1" />
             <span className={`${isBidWinner ? "text-teal-400" : "text-amber-500"}`}>

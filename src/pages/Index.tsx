@@ -5,9 +5,10 @@ import GameControls from "@/components/GameControls";
 import GameStatus from "@/components/GameStatus";
 import GameRules from "@/components/GameRules";
 import { toast } from "sonner";
-import { AlertCircle, MessageSquare, Book } from "lucide-react";
+import { MessageSquare, Book } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Winning combinations on the board
 const WINNING_COMBINATIONS = [
@@ -328,6 +329,8 @@ const Index = () => {
     addLog("New game started!", "system");
   };
 
+  const isMobile = useIsMobile();
+  
   return (
     <div className="min-h-screen w-full py-10 px-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="container mx-auto max-w-5xl">
@@ -360,44 +363,76 @@ const Index = () => {
           message={statusMessage}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-3 order-2 lg:order-1">
-            <AIAgent 
-              agent={agents[0]} 
-              isActive={currentPlayer?.id === agents[0].id}
-              isBidWinner={lastBidWinner === agents[0].id}
-              showLastBid={true}
-            />
-          </div>
-
-          <div className="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center gap-6">
-            <GameBoard 
-              currentPlayer={currentPlayer}
-              board={board}
-              winningCombination={winningCombination}
-              disabled={gameStatus !== "playing"}
-            />
-
-            <div className="mt-4">
-              <Button 
-                onClick={handleNewGame} 
-                variant="outline" 
-                className="bg-slate-800 border-teal-500/30 hover:bg-teal-500/20"
-              >
-                New Game
-              </Button>
+        {isMobile ? (
+          /* Mobile Layout */
+          <div className="flex flex-col gap-6">
+            {/* Game Board at the top */}
+            <div className="flex justify-center">
+              <GameBoard 
+                currentPlayer={currentPlayer}
+                board={board}
+                winningCombination={winningCombination}
+                disabled={gameStatus !== "playing"}
+              />
+            </div>
+            
+            {/* Agents side by side */}
+            <div className="grid grid-cols-2 gap-3">
+              <AIAgent 
+                agent={agents[0]} 
+                isActive={currentPlayer?.id === agents[0].id}
+                isBidWinner={lastBidWinner === agents[0].id}
+                showLastBid={true}
+              />
+              <AIAgent 
+                agent={agents[1]} 
+                isActive={currentPlayer?.id === agents[1].id}
+                isBidWinner={lastBidWinner === agents[1].id}
+                showLastBid={true}
+              />
             </div>
           </div>
+        ) : (
+          /* Desktop Layout */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-3 order-2 lg:order-1">
+              <AIAgent 
+                agent={agents[0]} 
+                isActive={currentPlayer?.id === agents[0].id}
+                isBidWinner={lastBidWinner === agents[0].id}
+                showLastBid={true}
+              />
+            </div>
 
-          <div className="lg:col-span-3 order-3">
-            <AIAgent 
-              agent={agents[1]} 
-              isActive={currentPlayer?.id === agents[1].id}
-              isBidWinner={lastBidWinner === agents[1].id}
-              showLastBid={true}
-            />
+            <div className="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center gap-6">
+              <GameBoard 
+                currentPlayer={currentPlayer}
+                board={board}
+                winningCombination={winningCombination}
+                disabled={gameStatus !== "playing"}
+              />
+
+              <div className="mt-4">
+                <Button 
+                  onClick={handleNewGame} 
+                  variant="outline" 
+                  className="bg-slate-800 border-teal-500/30 hover:bg-teal-500/20"
+                >
+                  New Game
+                </Button>
+              </div>
+            </div>
+
+            <div className="lg:col-span-3 order-3">
+              <AIAgent 
+                agent={agents[1]} 
+                isActive={currentPlayer?.id === agents[1].id}
+                isBidWinner={lastBidWinner === agents[1].id}
+                showLastBid={true}
+              />
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Game Log Section */}
         <div className="mt-12 cyber-panel p-4">

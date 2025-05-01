@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface GameControlsProps {
   onNewGame: () => void;
@@ -17,6 +18,7 @@ interface GameControlsProps {
 
 const GameControls = ({ onNewGame, onShowRules }: GameControlsProps) => {
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleReset = () => {
     setResetDialogOpen(false);
@@ -24,7 +26,7 @@ const GameControls = ({ onNewGame, onShowRules }: GameControlsProps) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3">
+    <div className={`flex ${isMobile ? 'flex-row' : 'flex-col sm:flex-row'} gap-3`}>
       <Button onClick={onShowRules} variant="outline" className="bg-slate-800 border-teal-500/30 hover:bg-teal-500/20">
         Game Rules
       </Button>
