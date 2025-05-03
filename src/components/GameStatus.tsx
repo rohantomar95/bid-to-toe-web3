@@ -1,4 +1,3 @@
-
 import { AgentType } from "./AIAgent";
 import { Trophy, Zap, DollarSign, AlertTriangle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -50,8 +49,7 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
       
       const timer = setTimeout(() => {
         setIsShaking(false);
-        // Return to original color when animation is done
-        setTextColor("text-teal-300/80");
+        // No longer change color back to teal - keep the vibrant color
       }, randomAnim === "animate-slide-shake" ? 1500 : 1200); // Adjust time based on animation
       
       return () => clearTimeout(timer);
