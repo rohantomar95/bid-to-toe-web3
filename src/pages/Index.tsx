@@ -59,6 +59,12 @@ interface GameLogEntry {
   type: "info" | "bid" | "move" | "system";
 }
 
+// Timing constants (in milliseconds)
+const THINKING_TIME_MIN = 1500;
+const THINKING_TIME_MAX = 2500;
+const BIDDING_DELAY = 2000;
+const MESSAGE_DISPLAY_DELAY = 1500;
+
 const Index = () => {
   // Game state
   const [agents, setAgents] = useState<AgentType[]>([...initialAgents]);
@@ -72,6 +78,7 @@ const Index = () => {
   const [rulesOpen, setRulesOpen] = useState(false);
   const [lastBidWinner, setLastBidWinner] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>("");
+  const [messageKey, setMessageKey] = useState<number>(0); // Add a key to trigger animations
   const [gameLogs, setGameLogs] = useState<GameLogEntry[]>([
     { 
       id: 0, 
@@ -85,7 +92,7 @@ const Index = () => {
   const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoBidTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Add a log entry
+  // Add a log entry and update message with animation
   const addLog = (message: string, type: GameLogEntry['type'] = "info") => {
     const newLog: GameLogEntry = {
       id: logIdRef.current++,
@@ -94,6 +101,10 @@ const Index = () => {
       type
     };
     setGameLogs(prev => [...prev, newLog]);
+    
+    // Update status message with animation
+    setStatusMessage(message);
+    setMessageKey(prev => prev + 1);
   };
   
   // Auto start first bidding
@@ -102,10 +113,11 @@ const Index = () => {
     const timer = setTimeout(() => {
       if (gameStatus === "bidding" && turn === 1) {
         setStatusMessage("Agents are analyzing the empty board...");
+        setMessageKey(prev => prev + 1);
         addLog("Game started. Waiting for initial bids.", "system");
         startAutoBidding();
       }
-    }, 1500);
+    }, MESSAGE_DISPLAY_DELAY);
     return () => clearTimeout(timer);
   }, []);
   
@@ -117,10 +129,13 @@ const Index = () => {
   // Auto place marker for AI during playing phase
   useEffect(() => {
     if (gameStatus === "playing" && currentPlayer) {
-      const randomThinkingTime = Math.random() * 1000 + 800; // 800-1800ms
+      // Random thinking time between min and max values
+      const randomThinkingTime = Math.random() * (THINKING_TIME_MAX - THINKING_TIME_MIN) + THINKING_TIME_MIN;
       const randomThinkingMessage = BOT_THINKING_MESSAGES[Math.floor(Math.random() * BOT_THINKING_MESSAGES.length)];
       
+      // Show thinking message with animation
       setStatusMessage(randomThinkingMessage);
+      setMessageKey(prev => prev + 1);
       
       // Clear any existing timeout to avoid race conditions
       if (autoPlayTimeoutRef.current) {
@@ -201,12 +216,9 @@ const Index = () => {
           const otherAgent = agents.find(agent => agent.id !== winner!.id);
           const bidMessage = `${winner.name} won the bid with $${bids[winner.id]} vs $${otherAgent ? bids[otherAgent.id] : 0}`;
           addLog(bidMessage, "bid");
-          setStatusMessage(bidMessage);
-          
-          // Remove toast notification for bid winner
         }
       }
-    }, 1500);
+    }, BIDDING_DELAY);
   };
 
   const checkGameOver = () => {
@@ -223,7 +235,6 @@ const Index = () => {
         if (winnerAgent) {
           const winMessage = `${winnerAgent.name} wins with a line of three!`;
           addLog(winMessage, "system");
-          setStatusMessage(winMessage);
           // Keep toast only for game over
           toast(`${winnerAgent.name} wins the game!`, {
             description: "Game over",
@@ -244,7 +255,6 @@ const Index = () => {
         setGameStatus("gameOver");
         const winMessage = `${sortedAgents[0].name} wins with more money! ($${sortedAgents[0].money})`;
         addLog(winMessage, "system");
-        setStatusMessage(winMessage);
         // Keep toast only for game over
         toast(`${sortedAgents[0].name} wins the game!`, {
           description: "With more remaining funds",
@@ -254,7 +264,6 @@ const Index = () => {
         setGameStatus("gameOver");
         const tieMessage = "It's a tie! Both agents have the same amount of money.";
         addLog(tieMessage, "system");
-        setStatusMessage(tieMessage);
         // Keep toast only for game over
         toast("It's a tie!", {
           description: "Game over",
@@ -274,7 +283,6 @@ const Index = () => {
         setGameStatus("gameOver");
         const winMessage = `${winnerAgent.name} wins by bankrupting opponent!`;
         addLog(winMessage, "system");
-        setStatusMessage(winMessage);
         // Keep toast only for game over
         toast(`${winnerAgent.name} wins the game!`, {
           description: "Opponent bankrupted",
@@ -302,12 +310,16 @@ const Index = () => {
     newBoard[selectedCell] = currentPlayer.mark;
     setBoard(newBoard);
     
-    addLog(`${currentPlayer.name} placed ${currentPlayer.mark} at position ${selectedCell + 1}`, "move");
+    const moveMessage = `${currentPlayer.name} placed ${currentPlayer.mark} at position ${selectedCell + 1}`;
+    addLog(moveMessage, "move");
     
-    // Move to next bidding phase
-    setGameStatus("bidding");
-    setTurn(turn + 1);
-    setStatusMessage("Next bidding round starting...");
+    // Move to next bidding phase with a slight delay
+    setTimeout(() => {
+      setGameStatus("bidding");
+      setTurn(turn + 1);
+      const nextBidMessage = "Next bidding round starting...";
+      addLog(nextBidMessage, "system");
+    }, MESSAGE_DISPLAY_DELAY);
   };
 
   const handleNewGame = () => {
@@ -321,7 +333,9 @@ const Index = () => {
     setWinningCombination(null);
     setTurn(1);
     setLastBidWinner(null);
-    setStatusMessage("New game starting! Agents are ready to bid.");
+    const newGameMessage = "New game starting! Agents are ready to bid.";
+    setStatusMessage(newGameMessage);
+    setMessageKey(prev => prev + 1);
     
     // Clear logs but keep the welcome message
     setGameLogs([{ 
@@ -365,6 +379,7 @@ const Index = () => {
           turn={turn}
           currentPlayer={currentPlayer}
           message={statusMessage}
+          messageKey={messageKey}
         />
 
         {isMobile ? (
