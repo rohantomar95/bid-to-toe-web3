@@ -402,12 +402,16 @@ const Index = () => {
                 isActive={currentPlayer?.id === agents[0].id}
                 isBidWinner={lastBidWinner === agents[0].id}
                 showLastBid={true}
+                isGameOver={gameStatus === "gameOver"}
+                isWinner={winner?.id === agents[0].id}
               />
               <AIAgent 
                 agent={agents[1]} 
                 isActive={currentPlayer?.id === agents[1].id}
                 isBidWinner={lastBidWinner === agents[1].id}
                 showLastBid={true}
+                isGameOver={gameStatus === "gameOver"}
+                isWinner={winner?.id === agents[1].id}
               />
             </div>
           </div>
@@ -420,6 +424,8 @@ const Index = () => {
                 isActive={currentPlayer?.id === agents[0].id}
                 isBidWinner={lastBidWinner === agents[0].id}
                 showLastBid={true}
+                isGameOver={gameStatus === "gameOver"}
+                isWinner={winner?.id === agents[0].id}
               />
             </div>
 
@@ -438,6 +444,8 @@ const Index = () => {
                 isActive={currentPlayer?.id === agents[1].id}
                 isBidWinner={lastBidWinner === agents[1].id}
                 showLastBid={true}
+                isGameOver={gameStatus === "gameOver"}
+                isWinner={winner?.id === agents[1].id}
               />
             </div>
           </div>

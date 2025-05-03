@@ -1,7 +1,7 @@
 
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { DollarSign } from "lucide-react";
+import { DollarSign, BadgeCheck } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export type AgentType = {
@@ -18,12 +18,23 @@ interface AIAgentProps {
   isActive: boolean;
   isBidWinner: boolean | null;
   showLastBid: boolean;
+  isGameOver?: boolean;
+  isWinner?: boolean;
 }
 
-const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) => {
+const AIAgent = ({ 
+  agent, 
+  isActive, 
+  isBidWinner, 
+  showLastBid, 
+  isGameOver = false,
+  isWinner = false
+}: AIAgentProps) => {
   const isMobile = useIsMobile();
   const statusColor = isActive ? "bg-teal-500" : "bg-muted";
-  const bidWinnerStyle = isBidWinner === true 
+  
+  // Only apply the pulse animation if it's not game over or if this agent is the winner
+  const bidWinnerStyle = !isGameOver && isBidWinner === true 
     ? "cyber-border animate-pulse-glow" 
     : isBidWinner === false 
       ? "opacity-70" 
@@ -35,9 +46,9 @@ const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) =>
   };
 
   return (
-    <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle}`}>
+    <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle} ${isWinner ? "border-2 border-teal-400" : ""}`}>
       <div className="relative mb-2">
-        <Avatar className={`${isMobile ? 'w-14 h-14' : 'w-20 h-20'} border-2 border-teal-500/50`}>
+        <Avatar className={`${isMobile ? 'w-14 h-14' : 'w-20 h-20'} border-2 ${isWinner ? "border-teal-400" : "border-teal-500/50"}`}>
           <img 
             src={agent.avatar} 
             alt={agent.name}
@@ -45,9 +56,19 @@ const AIAgent = ({ agent, isActive, isBidWinner, showLastBid }: AIAgentProps) =>
           />
         </Avatar>
         <div className={`absolute top-0 right-0 w-4 h-4 rounded-full ${statusColor} border border-white`}></div>
+        
+        {/* Winner badge */}
+        {isWinner && (
+          <div className="absolute -bottom-1 -right-1 bg-teal-500 rounded-full p-1 border border-white">
+            <BadgeCheck className="w-5 h-5 text-white" />
+          </div>
+        )}
       </div>
 
-      <h3 className={`cyber-text ${isMobile ? 'text-lg' : 'text-xl'} font-bold text-center mb-1`}>{agent.name}</h3>
+      <h3 className={`cyber-text ${isMobile ? 'text-lg' : 'text-xl'} font-bold text-center mb-1 ${isWinner ? "text-teal-400" : ""}`}>
+        {agent.name}
+        {isWinner && <span className="ml-2 text-teal-400">👑</span>}
+      </h3>
       <div className="text-sm text-muted-foreground mb-2">Agent {agent.mark}</div>
 
       <div className="w-full mb-3">

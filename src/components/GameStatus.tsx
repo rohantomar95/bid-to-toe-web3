@@ -107,7 +107,7 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
         {status === "gameOver" && winner && (
           <Badge 
             variant={getWinnerBadgeStyle().variant}
-            className={`ml-2 text-white animate-pulse-glow ${getWinnerBadgeStyle().className}`}
+            className={`ml-2 text-white ${getWinnerBadgeStyle().className}`}
           >
             WINNER
           </Badge>
@@ -124,10 +124,10 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
       )}
       
       {status === "gameOver" && winner && winReason && (
-        <div className={`mt-2 text-muted-foreground animate-fade-in ${isMobile ? 'text-xs' : ''}`}>
-          {winReason === "pattern" && "Victory by completing a line!"}
-          {winReason === "money" && "Victory with more remaining funds!"}
-          {winReason === "bankrupt" && "Victory by bankrupting opponent!"}
+        <div className={`mt-2 text-white font-medium animate-fade-in ${isMobile ? 'text-sm' : 'text-base'}`}>
+          {winReason === "pattern" && "Game Over: Victory by completing a line!"}
+          {winReason === "money" && "Game Over: Victory with more remaining funds!"}
+          {winReason === "bankrupt" && "Game Over: Victory by bankrupting opponent!"}
         </div>
       )}
     </div>
