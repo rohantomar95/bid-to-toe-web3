@@ -34,12 +34,19 @@ const AIAgent = ({
   const isMobile = useIsMobile();
   const statusColor = isActive ? "bg-teal-500" : "bg-muted";
   
-  // Only apply the pulse animation if it's not game over and this agent is the winner of the bid
+  // Only apply the pulse animation when:
+  // 1. It's not game over AND
+  // 2. This agent is the winner of the bid
   const bidWinnerStyle = !isGameOver && isBidWinner === true 
     ? "cyber-border animate-pulse-glow" 
-    : isBidWinner === false 
+    : isBidWinner === false && !isGameOver 
       ? "opacity-70" 
       : "";
+
+  // Special winner styling for game over state
+  const winnerStyle = isWinner 
+    ? "winner-card border-2 border-amber-400 shadow-lg shadow-amber-300/20" 
+    : "";
 
   const getProgressColor = () => {
     if (agent.money <= 20) return "bg-amber-500";
@@ -47,7 +54,7 @@ const AIAgent = ({
   };
 
   return (
-    <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle} ${isWinner ? "winner-card" : ""}`}>
+    <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle} ${winnerStyle}`}>
       <div className="relative mb-2">
         <Avatar className={`${isMobile ? 'w-14 h-14' : 'w-20 h-20'} border-2 ${isWinner ? "border-amber-400" : "border-teal-500/50"}`}>
           <img 
@@ -101,12 +108,12 @@ const AIAgent = ({
         />
       </div>
 
-      {agent.lastBid !== null && (
+      {agent.lastBid !== null && showLastBid && (
         <div className="cyber-border rounded-md px-3 py-2 text-center w-full">
           <div className={`text-sm text-muted-foreground ${isMobile ? 'hidden' : 'block'}`}>Last bid</div>
           <div className="cyber-text text-lg flex items-center justify-center">
             <DollarSign className="w-4 h-4 mr-1" />
-            <span className={`${isBidWinner ? "text-teal-400" : "text-amber-500"}`}>
+            <span className={`${isBidWinner && !isGameOver ? "text-teal-400" : "text-amber-500"}`}>
               {agent.lastBid}
             </span>
           </div>

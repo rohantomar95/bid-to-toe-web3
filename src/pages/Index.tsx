@@ -156,7 +156,7 @@ const Index = () => {
     };
   }, [gameStatus, currentPlayer]);
 
-  // Auto start bidding when in bidding phase
+  // Auto start bidding when in bidding phase - ONLY if we're not in gameOver state
   useEffect(() => {
     if (gameStatus === "bidding" && !winner) {
       // Auto start bidding after a short delay
@@ -165,6 +165,9 @@ const Index = () => {
   }, [gameStatus]);
 
   const startAutoBidding = () => {
+    // Don't start bidding if game is over
+    if (gameStatus === "gameOver") return;
+    
     // Clear any existing timeout
     if (autoBidTimeoutRef.current) {
       clearTimeout(autoBidTimeoutRef.current);
@@ -296,7 +299,7 @@ const Index = () => {
 
   // AI randomly selects an empty cell
   const placeAIMarker = () => {
-    if (!currentPlayer) return;
+    if (!currentPlayer || gameStatus === "gameOver") return;
     
     // Get all empty cells
     const emptyCells = board.map((cell, index) => (cell === null ? index : -1)).filter(index => index !== -1);
@@ -315,13 +318,42 @@ const Index = () => {
     const moveMessage = `${currentPlayer.name} placed ${currentPlayer.mark} at position ${selectedCell + 1}`;
     addLog(moveMessage, "move");
     
-    // Move to next bidding phase with a slight delay
-    setTimeout(() => {
-      setGameStatus("bidding");
-      setTurn(turn + 1);
-      const nextBidMessage = "Next bidding round starting...";
-      addLog(nextBidMessage, "system");
-    }, MESSAGE_DISPLAY_DELAY);
+    // Check for game over condition before moving to the next bidding phase
+    const hasGameEnded = checkIfGameEnds(newBoard, agents);
+    
+    // Move to next bidding phase with a slight delay ONLY if game isn't over
+    if (!hasGameEnded) {
+      setTimeout(() => {
+        setGameStatus("bidding");
+        setTurn(turn + 1);
+        const nextBidMessage = "Next bidding round starting...";
+        addLog(nextBidMessage, "system");
+      }, MESSAGE_DISPLAY_DELAY);
+    }
+  };
+
+  // New helper function to check if the game ends after a move
+  const checkIfGameEnds = (board: (string | null)[], currentAgents: AgentType[]): boolean => {
+    // Check for a line of three
+    for (const combination of WINNING_COMBINATIONS) {
+      const [a, b, c] = combination;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return true;
+      }
+    }
+
+    // Check for a full board
+    if (!board.includes(null)) {
+      return true;
+    }
+
+    // Check if any agent has $0
+    const bankruptAgents = currentAgents.filter(agent => agent.money <= 0);
+    if (bankruptAgents.length > 0) {
+      return true;
+    }
+
+    return false;
   };
 
   const handleNewGame = () => {
