@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import AIAgent, { AgentType } from "@/components/AIAgent";
 import GameBoard from "@/components/GameBoard";
@@ -5,7 +6,8 @@ import GameControls from "@/components/GameControls";
 import GameStatus from "@/components/GameStatus";
 import GameRules from "@/components/GameRules";
 import { toast } from "sonner";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -381,6 +383,19 @@ const Index = () => {
           message={statusMessage}
           messageKey={messageKey}
         />
+        
+        {/* Restart Game Button - shown prominently when game is over */}
+        {gameStatus === "gameOver" && (
+          <div className="flex justify-center mb-6 animate-fade-in">
+            <Button 
+              onClick={handleNewGame} 
+              className="restart-button gap-2 text-base py-2.5 px-8"
+            >
+              <RefreshCw className="h-5 w-5" />
+              New Battle
+            </Button>
+          </div>
+        )}
 
         {isMobile ? (
           /* Mobile Layout */

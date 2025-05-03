@@ -1,7 +1,8 @@
 
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { DollarSign, BadgeCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { DollarSign, BadgeCheck, Trophy } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export type AgentType = {
@@ -33,7 +34,7 @@ const AIAgent = ({
   const isMobile = useIsMobile();
   const statusColor = isActive ? "bg-teal-500" : "bg-muted";
   
-  // Only apply the pulse animation if it's not game over or if this agent is the winner
+  // Only apply the pulse animation if it's not game over and this agent is the winner of the bid
   const bidWinnerStyle = !isGameOver && isBidWinner === true 
     ? "cyber-border animate-pulse-glow" 
     : isBidWinner === false 
@@ -46,9 +47,9 @@ const AIAgent = ({
   };
 
   return (
-    <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle} ${isWinner ? "border-2 border-teal-400" : ""}`}>
+    <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle} ${isWinner ? "winner-card" : ""}`}>
       <div className="relative mb-2">
-        <Avatar className={`${isMobile ? 'w-14 h-14' : 'w-20 h-20'} border-2 ${isWinner ? "border-teal-400" : "border-teal-500/50"}`}>
+        <Avatar className={`${isMobile ? 'w-14 h-14' : 'w-20 h-20'} border-2 ${isWinner ? "border-amber-400" : "border-teal-500/50"}`}>
           <img 
             src={agent.avatar} 
             alt={agent.name}
@@ -57,19 +58,28 @@ const AIAgent = ({
         </Avatar>
         <div className={`absolute top-0 right-0 w-4 h-4 rounded-full ${statusColor} border border-white`}></div>
         
-        {/* Winner badge */}
+        {/* Winner badge with trophy icon */}
         {isWinner && (
-          <div className="absolute -bottom-1 -right-1 bg-teal-500 rounded-full p-1 border border-white">
-            <BadgeCheck className="w-5 h-5 text-white" />
+          <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full p-1.5 shadow-lg border border-amber-200">
+            <Trophy className="w-5 h-5 text-white" />
           </div>
         )}
       </div>
 
-      <h3 className={`cyber-text ${isMobile ? 'text-lg' : 'text-xl'} font-bold text-center mb-1 ${isWinner ? "text-teal-400" : ""}`}>
+      <h3 className={`cyber-text ${isMobile ? 'text-lg' : 'text-xl'} font-bold text-center mb-1 ${isWinner ? "text-amber-400" : ""}`}>
         {agent.name}
-        {isWinner && <span className="ml-2 text-teal-400">👑</span>}
       </h3>
       <div className="text-sm text-muted-foreground mb-2">Agent {agent.mark}</div>
+
+      {/* Winner badge at top */}
+      {isWinner && (
+        <Badge 
+          variant="outline" 
+          className="bg-gradient-to-r from-amber-400 to-yellow-500 border-amber-300 text-white font-semibold mb-2 px-3 shadow-md"
+        >
+          CHAMPION
+        </Badge>
+      )}
 
       <div className="w-full mb-3">
         <div className="flex justify-between mb-1">

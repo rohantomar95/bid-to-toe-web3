@@ -56,6 +56,13 @@
                 inset 0 0 15px rgba(20, 184, 166, 0.05);
   }
   
+  .winner-card {
+    @apply border-2 border-amber-400/70;
+    background: linear-gradient(to bottom, rgba(251, 191, 36, 0.1), rgba(20, 184, 166, 0.05));
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.2), 
+                inset 0 0 20px rgba(251, 191, 36, 0.05);
+  }
+  
   .cyber-text {
     @apply font-medium tracking-wide;
     text-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
@@ -91,13 +98,21 @@
     shadow-lg hover:shadow-xl hover:-translate-y-1;
   }
   
-  .cyber-button::before {
+  .restart-button {
+    @apply relative overflow-hidden rounded-lg px-6 py-3 transition-all duration-300 
+    bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-400 
+    text-white font-bold tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-1;
+  }
+  
+  .cyber-button::before,
+  .restart-button::before {
     content: '';
     @apply absolute inset-0 opacity-0 transition-opacity duration-300;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   }
   
-  .cyber-button:hover::before {
+  .cyber-button:hover::before,
+  .restart-button:hover::before {
     @apply opacity-100;
     animation: shine 1.5s infinite;
   }
