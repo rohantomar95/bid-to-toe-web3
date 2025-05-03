@@ -23,6 +23,7 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
   // Animation state
   const [isShaking, setIsShaking] = useState(false);
   const [animationType, setAnimationType] = useState("animate-shake");
+  const [textColor, setTextColor] = useState("text-teal-300/80");
   
   // Trigger shake animation when message changes
   useEffect(() => {
@@ -31,11 +32,26 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
       const animations = ["animate-shake", "animate-chaotic-shake", "animate-slide-shake"];
       const randomAnim = animations[Math.floor(Math.random() * animations.length)];
       
+      // Choose a random vibrant color
+      const colors = [
+        "text-purple-400", 
+        "text-cyan-400", 
+        "text-pink-400",
+        "text-emerald-400",
+        "text-amber-400", 
+        "text-sky-400",
+        "text-rose-400"
+      ];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      setTextColor(randomColor);
       setAnimationType(randomAnim);
       setIsShaking(true);
       
       const timer = setTimeout(() => {
         setIsShaking(false);
+        // Return to original color when animation is done
+        setTextColor("text-teal-300/80");
       }, randomAnim === "animate-slide-shake" ? 1500 : 1200); // Adjust time based on animation
       
       return () => clearTimeout(timer);
@@ -75,7 +91,7 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
       {message && (
         <div 
           key={messageKey} 
-          className={`mt-1 text-teal-300/80 ${messageAnimClass} ${isMobile ? 'text-sm' : ''}`}
+          className={`mt-1 ${textColor} ${messageAnimClass} ${isMobile ? 'text-sm' : ''} font-medium`}
         >
           {message}
         </div>
