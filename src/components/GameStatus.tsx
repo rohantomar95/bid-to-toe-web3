@@ -83,17 +83,17 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
 
   // Define winner badge style based on win reason
   const getWinnerBadgeStyle = () => {
-    if (!winReason) return {};
+    if (!winReason) return { variant: "default" as const, className: "" };
     
     switch(winReason) {
       case "pattern":
-        return { variant: "default", className: "bg-emerald-500 hover:bg-emerald-600" };
+        return { variant: "default" as const, className: "bg-emerald-500 hover:bg-emerald-600" };
       case "money":
-        return { variant: "default", className: "bg-amber-500 hover:bg-amber-600" };
+        return { variant: "default" as const, className: "bg-amber-500 hover:bg-amber-600" };
       case "bankrupt":
-        return { variant: "default", className: "bg-rose-500 hover:bg-rose-600" };
+        return { variant: "default" as const, className: "bg-rose-500 hover:bg-rose-600" };
       default:
-        return {};
+        return { variant: "default" as const, className: "" };
     }
   };
   
