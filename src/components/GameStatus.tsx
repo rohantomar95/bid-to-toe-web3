@@ -1,7 +1,9 @@
+
 import { AgentType } from "./AIAgent";
 import { Trophy, Zap, DollarSign, AlertTriangle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface GameStatusProps {
   status: "bidding" | "playing" | "gameOver";
@@ -78,12 +80,38 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
   const messageAnimClass = isShaking 
     ? animationType 
     : "transition-all duration-500 ease-out";
+
+  // Define winner badge style based on win reason
+  const getWinnerBadgeStyle = () => {
+    if (!winReason) return {};
+    
+    switch(winReason) {
+      case "pattern":
+        return { variant: "default", className: "bg-emerald-500 hover:bg-emerald-600" };
+      case "money":
+        return { variant: "default", className: "bg-amber-500 hover:bg-amber-600" };
+      case "bankrupt":
+        return { variant: "default", className: "bg-rose-500 hover:bg-rose-600" };
+      default:
+        return {};
+    }
+  };
   
   return (
     <div className="text-center mb-4">
       <h2 className={statusClass}>
         {statusIcon}
         {statusText}
+        
+        {/* Winner Badge */}
+        {status === "gameOver" && winner && (
+          <Badge 
+            variant={getWinnerBadgeStyle().variant}
+            className={`ml-2 text-white animate-pulse-glow ${getWinnerBadgeStyle().className}`}
+          >
+            WINNER
+          </Badge>
+        )}
       </h2>
       
       {message && (
