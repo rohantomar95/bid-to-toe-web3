@@ -22,14 +22,21 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
   
   // Animation state
   const [isShaking, setIsShaking] = useState(false);
+  const [animationType, setAnimationType] = useState("animate-shake");
   
   // Trigger shake animation when message changes
   useEffect(() => {
     if (message) {
+      // Choose a random animation type
+      const animations = ["animate-shake", "animate-chaotic-shake", "animate-slide-shake"];
+      const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+      
+      setAnimationType(randomAnim);
       setIsShaking(true);
+      
       const timer = setTimeout(() => {
         setIsShaking(false);
-      }, 1000); // Shake for 1 second
+      }, randomAnim === "animate-slide-shake" ? 1500 : 1200); // Adjust time based on animation
       
       return () => clearTimeout(timer);
     }
@@ -55,7 +62,7 @@ const GameStatus = ({ status, winner, winReason, turn, currentPlayer, message, m
   
   // Define the message animation class
   const messageAnimClass = isShaking 
-    ? "animate-shake" 
+    ? animationType 
     : "transition-all duration-500 ease-out";
   
   return (
