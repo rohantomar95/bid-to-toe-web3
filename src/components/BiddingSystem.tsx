@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DollarSign, Sparkles } from "lucide-react";
@@ -10,6 +9,7 @@ interface BiddingSystemProps {
   onBidComplete: (agentId: string, winningBid: number) => void;
   disabled: boolean;
   autoStart?: boolean;
+  onBiddingStateChange?: (isBidding: boolean) => void;
 }
 
 // Generate a random bid between min and max (inclusive)
@@ -40,12 +40,25 @@ const BIDDING_MESSAGES = [
   "Bidding protocols initializing...",
 ];
 
-const BiddingSystem = ({ agents, onBidComplete, disabled, autoStart = false }: BiddingSystemProps) => {
+const BiddingSystem = ({ 
+  agents, 
+  onBidComplete, 
+  disabled, 
+  autoStart = false,
+  onBiddingStateChange
+}: BiddingSystemProps) => {
   const [isBidding, setIsBidding] = useState(false);
   const [bids, setBids] = useState<{[key: string]: number | null}>({});
   const [showResults, setShowResults] = useState(false);
   const [tiedBid, setTiedBid] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Waiting for bids...");
+
+  // Notify parent component when bidding state changes
+  useEffect(() => {
+    if (onBiddingStateChange) {
+      onBiddingStateChange(isBidding);
+    }
+  }, [isBidding, onBiddingStateChange]);
 
   useEffect(() => {
     if (!disabled) {

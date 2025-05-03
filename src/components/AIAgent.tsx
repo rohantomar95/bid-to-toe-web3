@@ -1,4 +1,3 @@
-
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +20,7 @@ interface AIAgentProps {
   showLastBid: boolean;
   isGameOver?: boolean;
   isWinner?: boolean;
+  activeBidding?: boolean; // Add new prop for active bidding state
 }
 
 const AIAgent = ({ 
@@ -29,17 +29,19 @@ const AIAgent = ({
   isBidWinner, 
   showLastBid, 
   isGameOver = false,
-  isWinner = false
+  isWinner = false,
+  activeBidding = false
 }: AIAgentProps) => {
   const isMobile = useIsMobile();
   const statusColor = isActive ? "bg-teal-500" : "bg-muted";
   
-  // Only apply the pulse animation when:
-  // 1. It's not game over AND
-  // 2. This agent is the winner of the bid
-  const bidWinnerStyle = !isGameOver && isBidWinner === true 
+  // Only apply the pulse animation when ALL of these conditions are met:
+  // 1. Not in active bidding phase
+  // 2. Not game over
+  // 3. This agent is the bid winner
+  const bidWinnerStyle = !activeBidding && !isGameOver && isBidWinner === true 
     ? "cyber-border animate-pulse-glow" 
-    : isBidWinner === false && !isGameOver 
+    : isBidWinner === false && !isGameOver && !activeBidding
       ? "opacity-70" 
       : "";
 
@@ -113,7 +115,7 @@ const AIAgent = ({
           <div className={`text-sm text-muted-foreground ${isMobile ? 'hidden' : 'block'}`}>Last bid</div>
           <div className="cyber-text text-lg flex items-center justify-center">
             <DollarSign className="w-4 h-4 mr-1" />
-            <span className={`${isBidWinner && !isGameOver ? "text-teal-400" : "text-amber-500"}`}>
+            <span className={`${isBidWinner && !isGameOver && !activeBidding ? "text-teal-400" : "text-amber-500"}`}>
               {agent.lastBid}
             </span>
           </div>

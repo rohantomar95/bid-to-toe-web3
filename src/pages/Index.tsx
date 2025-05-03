@@ -1,10 +1,10 @@
-
 import { useState, useEffect, useRef } from "react";
 import AIAgent, { AgentType } from "@/components/AIAgent";
 import GameBoard from "@/components/GameBoard";
 import GameControls from "@/components/GameControls";
 import GameStatus from "@/components/GameStatus";
 import GameRules from "@/components/GameRules";
+import BiddingSystem from "@/components/BiddingSystem";
 import { toast } from "sonner";
 import { MessageSquare, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -109,6 +109,9 @@ const Index = () => {
     setMessageKey(prev => prev + 1);
   };
   
+  // Add a new state to track active bidding
+  const [isActiveBidding, setIsActiveBidding] = useState(false);
+  
   // Auto start first bidding
   useEffect(() => {
     // Give users a moment to see the initial state
@@ -164,6 +167,10 @@ const Index = () => {
     }
   }, [gameStatus]);
 
+  const handleBiddingStateChange = (isBidding: boolean) => {
+    setIsActiveBidding(isBidding);
+  };
+
   const startAutoBidding = () => {
     // Don't start bidding if game is over
     if (gameStatus === "gameOver") return;
@@ -172,6 +179,9 @@ const Index = () => {
     if (autoBidTimeoutRef.current) {
       clearTimeout(autoBidTimeoutRef.current);
     }
+    
+    // Set active bidding state to true
+    setIsActiveBidding(true);
     
     // Add a bit of delay to make it seem like AI is thinking
     autoBidTimeoutRef.current = setTimeout(() => {
@@ -451,6 +461,7 @@ const Index = () => {
                 showLastBid={true}
                 isGameOver={gameStatus === "gameOver"}
                 isWinner={winner?.id === agents[0].id}
+                activeBidding={isActiveBidding}
               />
               <AIAgent 
                 agent={agents[1]} 
@@ -459,8 +470,28 @@ const Index = () => {
                 showLastBid={true}
                 isGameOver={gameStatus === "gameOver"}
                 isWinner={winner?.id === agents[1].id}
+                activeBidding={isActiveBidding}
               />
             </div>
+            
+            {/* Add bidding system here */}
+            {gameStatus === "bidding" && (
+              <BiddingSystem
+                agents={agents}
+                onBidComplete={(agentId, bid) => {
+                  // Handle bid completion logic
+                  const winner = agents.find(a => a.id === agentId);
+                  if (winner) {
+                    setCurrentPlayer(winner);
+                    setLastBidWinner(winner.id);
+                    setGameStatus("playing");
+                  }
+                }}
+                disabled={gameStatus !== "bidding"}
+                autoStart={true}
+                onBiddingStateChange={handleBiddingStateChange}
+              />
+            )}
           </div>
         ) : (
           /* Desktop Layout */
@@ -473,6 +504,7 @@ const Index = () => {
                 showLastBid={true}
                 isGameOver={gameStatus === "gameOver"}
                 isWinner={winner?.id === agents[0].id}
+                activeBidding={isActiveBidding}
               />
             </div>
 
@@ -483,6 +515,25 @@ const Index = () => {
                 winningCombination={winningCombination}
                 disabled={gameStatus !== "playing"}
               />
+              
+              {/* Add bidding system here */}
+              {gameStatus === "bidding" && (
+                <BiddingSystem
+                  agents={agents}
+                  onBidComplete={(agentId, bid) => {
+                    // Handle bid completion logic
+                    const winner = agents.find(a => a.id === agentId);
+                    if (winner) {
+                      setCurrentPlayer(winner);
+                      setLastBidWinner(winner.id);
+                      setGameStatus("playing");
+                    }
+                  }}
+                  disabled={gameStatus !== "bidding"}
+                  autoStart={true}
+                  onBiddingStateChange={handleBiddingStateChange}
+                />
+              )}
             </div>
 
             <div className="lg:col-span-3 order-3">
@@ -493,6 +544,7 @@ const Index = () => {
                 showLastBid={true}
                 isGameOver={gameStatus === "gameOver"}
                 isWinner={winner?.id === agents[1].id}
+                activeBidding={isActiveBidding}
               />
             </div>
           </div>
