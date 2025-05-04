@@ -13,6 +13,7 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
   const [flipping, setFlipping] = useState(false);
   const [winner, setWinner] = useState<AgentType | null>(null);
   const [rotation, setRotation] = useState(0);
+  const [tosses, setTosses] = useState(0);
 
   useEffect(() => {
     startCoinFlip();
@@ -34,6 +35,11 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
       currentRotation += 18; // Speed of rotation
       setRotation(currentRotation);
       
+      // Count the number of tosses (full 360 degree rotations)
+      if (currentRotation % 360 === 0) {
+        setTosses(prev => prev + 1);
+      }
+      
       if (currentRotation >= totalDegrees) {
         clearInterval(flipInterval);
         // Randomly select winner
@@ -53,7 +59,7 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
     <div className="cyber-panel p-6 flex flex-col items-center">
       <h3 className="cyber-text text-xl mb-4 text-center">Bid Tie! Resolving with Coin Toss</h3>
       
-      <div className="relative w-32 h-32 mb-8">
+      <div className={`relative w-32 h-32 mb-8 ${flipping ? 'animate-bounce-subtle' : ''}`}>
         <div 
           className={`coin absolute w-full h-full rounded-full transition-all duration-100 ${flipping ? '' : 'shadow-lg'}`}
           style={{ 
@@ -72,6 +78,12 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
           </div>
         </div>
       </div>
+
+      {flipping && (
+        <div className="text-sm text-cyan-400 animate-pulse mb-2">
+          Toss #{tosses}...
+        </div>
+      )}
 
       {winner && (
         <div className="animate-fade-in flex flex-col items-center">

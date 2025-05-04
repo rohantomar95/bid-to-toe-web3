@@ -96,9 +96,20 @@ const BiddingSystem = ({
     
     // Generate bids for both agents
     const newBids = { ...bids };
-    agents.forEach(agent => {
-      newBids[agent.id] = generateRandomBid(agent);
-    });
+    
+    // Generate bids - but add a 50% chance of a tie in the first round
+    if (Math.random() < 0.5) {
+      // Force a tie - make both bids the same
+      const tiedBidAmount = Math.floor(Math.min(agents[0].money, agents[1].money) * 0.15);
+      agents.forEach(agent => {
+        newBids[agent.id] = tiedBidAmount;
+      });
+    } else {
+      // Regular bidding
+      agents.forEach(agent => {
+        newBids[agent.id] = generateRandomBid(agent);
+      });
+    }
     
     // Simulate AI "thinking" time
     setTimeout(() => {

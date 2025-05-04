@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import AIAgent, { AgentType } from "@/components/AIAgent";
 import GameBoard from "@/components/GameBoard";
@@ -91,6 +92,9 @@ const Index = () => {
     }
   ]);
   
+  // Track if we've had a tie in the current game
+  const [hadTieInGame, setHadTieInGame] = useState(false);
+  
   const logIdRef = useRef(1);
   const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoBidTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -126,6 +130,13 @@ const Index = () => {
     }, MESSAGE_DISPLAY_DELAY);
     return () => clearTimeout(timer);
   }, []);
+  
+  // Reset hadTieInGame when a new game starts
+  useEffect(() => {
+    if (turn === 1) {
+      setHadTieInGame(false);
+    }
+  }, [turn]);
   
   // Check for a winner
   useEffect(() => {
@@ -190,12 +201,30 @@ const Index = () => {
         // Generate bids for both agents
         const bids: { [key: string]: number } = {};
         
-        agents.forEach(agent => {
-          // Generate a random bid between 1 and 25% of their money
-          const maxBid = Math.min(agent.money, Math.floor(agent.money * 0.25));
-          const minBid = Math.max(1, Math.floor(agent.money * 0.05));
-          bids[agent.id] = Math.floor(Math.random() * (maxBid - minBid + 1)) + minBid;
-        });
+        // Should we force a tie in this round?
+        // Force a tie in the first round if we haven't had one yet
+        const shouldForceTie = !hadTieInGame && (turn === 1 || Math.random() < 0.3);
+        
+        if (shouldForceTie) {
+          // Force a tied bid - both agents bid the same amount
+          const tiedBidAmount = Math.floor(Math.min(agents[0].money, agents[1].money) * 0.15);
+          agents.forEach(agent => {
+            bids[agent.id] = tiedBidAmount;
+          });
+          
+          // Mark that we've had a tie in this game
+          setHadTieInGame(true);
+          
+          addLog("Looks like the agents are thinking alike!", "system");
+        } else {
+          // Normal bidding logic
+          agents.forEach(agent => {
+            // Generate a random bid between 1 and 25% of their money
+            const maxBid = Math.min(agent.money, Math.floor(agent.money * 0.25));
+            const minBid = Math.max(1, Math.floor(agent.money * 0.05));
+            bids[agent.id] = Math.floor(Math.random() * (maxBid - minBid + 1)) + minBid;
+          });
+        }
         
         // Determine winner
         let winner: AgentType | null = null;
@@ -211,20 +240,28 @@ const Index = () => {
         // Handle tied bids
         const tiedAgents = agents.filter(agent => bids[agent.id] === highestBid);
         if (tiedAgents.length > 1) {
-          // In case of a tie, choose a random winner
-          winner = tiedAgents[Math.floor(Math.random() * tiedAgents.length)];
-          addLog("Tie breaker! Random selection to determine turn order.", "system");
+          // In case of a tie, we'll let the coin toss handle it
+          addLog("Tie breaker! Both agents bid the same amount.", "system");
         }
         
-        if (winner) {
-          // Update all agents with their bids
-          const updatedAgents = agents.map(agent => ({
-            ...agent,
-            money: agent.money - bids[agent.id],
-            lastBid: bids[agent.id]
-          }));
+        // Update all agents with their bids
+        const updatedAgents = agents.map(agent => ({
+          ...agent,
+          money: agent.money - bids[agent.id],
+          lastBid: bids[agent.id]
+        }));
+        
+        setAgents(updatedAgents);
+        
+        if (tiedAgents.length > 1) {
+          // Let the bidding system handle the tie with a coin toss
+          // The bidding phase will not transition to playing phase until
+          // the coin toss is resolved
           
-          setAgents(updatedAgents);
+          const bidMessage = `Tied bids! Both agents bid $${highestBid}!`;
+          addLog(bidMessage, "bid");
+        } else if (winner) {
+          // Normal flow - we have a winner
           setCurrentPlayer(winner);
           setLastBidWinner(winner.id);
           setGameStatus("playing");
@@ -378,6 +415,7 @@ const Index = () => {
     setWinningCombination(null);
     setTurn(1);
     setLastBidWinner(null);
+    setHadTieInGame(false); // Reset the tie tracker
     const newGameMessage = "New game starting! Agents are ready to bid.";
     setStatusMessage(newGameMessage);
     setMessageKey(prev => prev + 1);

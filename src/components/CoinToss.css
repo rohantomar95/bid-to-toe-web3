@@ -11,9 +11,22 @@
   }
 }
 
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
 .coin {
   animation: glow 2s infinite alternate;
   border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 1.2s infinite;
 }
 
 .backface-hidden {
