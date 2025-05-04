@@ -13,7 +13,6 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
   const [flipping, setFlipping] = useState(false);
   const [winner, setWinner] = useState<AgentType | null>(null);
   const [rotation, setRotation] = useState(0);
-  const [tosses, setTosses] = useState(0);
   const [commentary, setCommentary] = useState("Resolving tie with a coin toss...");
   const [showResult, setShowResult] = useState(false);
 
@@ -31,9 +30,8 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
     // Set initial commentary
     setCommentary("Both agents bid the same amount! Initiating coin toss protocol...");
     
-    // Generate random number of rotations (3-6 rotations for slower animation)
-    const numRotations = 3 + Math.floor(Math.random() * 3);
-    const totalDegrees = numRotations * 360;
+    // Single full rotation (plus a little extra for effect)
+    const totalDegrees = 380;
     
     // Randomly select winner before animation
     const winnerIndex = Math.floor(Math.random() * agents.length);
@@ -52,25 +50,15 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
       adjustedTotalDegrees += 180;
     }
     
-    // Animate the coin flip with slower rotation
+    // Animate the coin flip
     let currentRotation = 0;
     const flipInterval = setInterval(() => {
-      currentRotation += 9; // Reduced speed (was 18)
+      currentRotation += 10; // Speed adjusted for single flip
       setRotation(currentRotation);
       
-      // Count the number of tosses (full 360 degree rotations)
-      if (currentRotation % 360 === 0) {
-        const newTosses = currentRotation / 360;
-        setTosses(newTosses);
-        
-        // Update commentary based on toss count
-        if (newTosses === 1) {
-          setCommentary("First toss... the tension builds!");
-        } else if (newTosses === 2) {
-          setCommentary("Second toss... agents analyzing probabilities!");
-        } else if (newTosses < numRotations) {
-          setCommentary(`Toss #${newTosses}... quantum algorithms at work!`);
-        }
+      // Update commentary
+      if (currentRotation > adjustedTotalDegrees / 3) {
+        setCommentary("Coin is flipping...");
       }
       
       if (currentRotation >= adjustedTotalDegrees) {
@@ -84,12 +72,12 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
         // Final commentary
         setCommentary(`${selectedWinner.name} wins the toss with ${selectedWinner.mark}!`);
         
-        // Notify parent component after a longer delay to allow user to see the result
+        // Notify parent component after a delay to allow user to see the result
         setTimeout(() => {
           onComplete(selectedWinner.id);
         }, 2500);
       }
-    }, 60); // Increased interval from 30ms to 60ms for slower animation
+    }, 30); // Faster interval for smoother animation
   };
 
   return (
@@ -119,13 +107,6 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
             </div>
           </div>
         </div>
-
-        {flipping ? (
-          <div className="text-base text-cyan-400 animate-pulse mb-4">
-            <span className="mr-2 font-bold">Toss #{tosses}</span>
-            <span className="text-sm">{tosses % 2 === 0 ? agents[0].mark : agents[1].mark} is showing</span>
-          </div>
-        ) : null}
 
         <div className={`text-center mb-4 text-white ${flipping ? 'animate-pulse' : ''}`}>
           {commentary}
