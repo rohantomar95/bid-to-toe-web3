@@ -15,6 +15,7 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
   const [rotation, setRotation] = useState(0);
   const [tosses, setTosses] = useState(0);
   const [commentary, setCommentary] = useState("Resolving tie with a coin toss...");
+  const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
     startCoinFlip();
@@ -25,6 +26,7 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
 
     setFlipping(true);
     setWinner(null);
+    setShowResult(false);
     
     // Set initial commentary
     setCommentary("Both agents bid the same amount! Initiating coin toss protocol...");
@@ -32,6 +34,23 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
     // Generate random number of rotations (3-6 rotations for slower animation)
     const numRotations = 3 + Math.floor(Math.random() * 3);
     const totalDegrees = numRotations * 360;
+    
+    // Randomly select winner before animation
+    const winnerIndex = Math.floor(Math.random() * agents.length);
+    const selectedWinner = agents[winnerIndex];
+    
+    // Determine final rotation to end on winner's face
+    // If winner is X (index 0), end with X showing (even number of 180° rotations)
+    // If winner is O (index 1), end with O showing (odd number of 180° rotations)
+    let adjustedTotalDegrees = totalDegrees;
+    const isXWinner = winnerIndex === 0;
+    const shouldEndOnEvenRotation = isXWinner; // X should show if total rotations is even
+    
+    const isCurrentlyEvenRotation = Math.floor(adjustedTotalDegrees / 180) % 2 === 0;
+    if (shouldEndOnEvenRotation !== isCurrentlyEvenRotation) {
+      // Add 180 more degrees to flip to the correct side
+      adjustedTotalDegrees += 180;
+    }
     
     // Animate the coin flip with slower rotation
     let currentRotation = 0;
@@ -54,18 +73,18 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
         }
       }
       
-      if (currentRotation >= totalDegrees) {
+      if (currentRotation >= adjustedTotalDegrees) {
         clearInterval(flipInterval);
-        // Randomly select winner
-        const winnerIndex = Math.floor(Math.random() * agents.length);
-        const selectedWinner = agents[winnerIndex];
         setWinner(selectedWinner);
         setFlipping(false);
+        
+        // Shows the settled coin with winner's mark
+        setShowResult(true);
         
         // Final commentary
         setCommentary(`${selectedWinner.name} wins the toss with ${selectedWinner.mark}!`);
         
-        // Notify parent component after a longer delay
+        // Notify parent component after a longer delay to allow user to see the result
         setTimeout(() => {
           onComplete(selectedWinner.id);
         }, 2500);
@@ -81,7 +100,7 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
           Coin Toss Tie Breaker!
         </h3>
         
-        <div className={`relative w-40 h-40 mb-8 ${flipping ? 'animate-bounce-subtle' : ''}`}>
+        <div className={`relative w-40 h-40 mb-8 ${flipping ? 'animate-bounce-subtle' : showResult ? 'animate-scale-in' : ''}`}>
           <div 
             className={`coin absolute w-full h-full rounded-full transition-all duration-100 ${flipping ? '' : 'shadow-lg'}`}
             style={{ 
@@ -108,11 +127,11 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
           </div>
         ) : null}
 
-        <div className="animate-pulse text-center mb-4 text-white">
+        <div className={`text-center mb-4 text-white ${flipping ? 'animate-pulse' : ''}`}>
           {commentary}
         </div>
 
-        {winner && (
+        {winner && showResult && (
           <div className="animate-fade-in flex flex-col items-center">
             <Badge 
               variant="default"
