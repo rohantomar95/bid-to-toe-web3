@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import AIAgent, { AgentType } from "@/components/AIAgent";
 import GameBoard from "@/components/GameBoard";
@@ -6,6 +5,7 @@ import GameControls from "@/components/GameControls";
 import GameStatus from "@/components/GameStatus";
 import GameRules from "@/components/GameRules";
 import BiddingSystem from "@/components/BiddingSystem";
+import CoinToss from "@/components/CoinToss";
 import { toast } from "sonner";
 import { MessageSquare, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -91,6 +91,9 @@ const Index = () => {
       type: "system" 
     }
   ]);
+  
+  // Add a state for showing the coin toss demo
+  const [showCoinTossDemo, setShowCoinTossDemo] = useState(false);
   
   // Track if we've had a tie in the current game
   const [hadTieInGame, setHadTieInGame] = useState(false);
@@ -416,6 +419,7 @@ const Index = () => {
     setTurn(1);
     setLastBidWinner(null);
     setHadTieInGame(false); // Reset the tie tracker
+    setShowCoinTossDemo(false); // Hide coin toss demo if showing
     const newGameMessage = "New game starting! Agents are ready to bid.";
     setStatusMessage(newGameMessage);
     setMessageKey(prev => prev + 1);
@@ -436,7 +440,23 @@ const Index = () => {
     addLog("New game started!", "system");
   };
 
+  // New function to handle demonstrating the coin toss
+  const handleDemoToss = () => {
+    setShowCoinTossDemo(true);
+    addLog("Demonstrating the coin toss tie breaker...", "system");
+  };
+
+  // Handle coin toss demo completion
+  const handleCoinTossDemoComplete = () => {
+    setShowCoinTossDemo(false);
+  };
+
   const isMobile = useIsMobile();
+  
+  // If showing coin toss demo, render the coin toss component
+  if (showCoinTossDemo) {
+    return <CoinToss agents={agents} onComplete={handleCoinTossDemoComplete} />;
+  }
   
   return (
     <div className="min-h-screen w-full py-10 px-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -451,7 +471,11 @@ const Index = () => {
           
           {/* Rules Button moved up in the layout */}
           <div className="mt-4">
-            <GameControls onShowRules={() => setRulesOpen(true)} />
+            <GameControls 
+              onShowRules={() => setRulesOpen(true)} 
+              onSimulateCoinToss={handleDemoToss}
+              showCoinTossButton={gameStatus === "gameOver"} 
+            />
           </div>
         </header>
 
@@ -465,9 +489,9 @@ const Index = () => {
           messageKey={messageKey}
         />
         
-        {/* Restart Game Button - shown prominently when game is over */}
+        {/* Game control buttons - shown when game is over */}
         {gameStatus === "gameOver" && (
-          <div className="flex justify-center mb-6 animate-fade-in">
+          <div className="flex justify-center mb-6 animate-fade-in gap-4">
             <Button 
               onClick={handleNewGame} 
               className="restart-button gap-2 text-base py-2.5 px-8"
