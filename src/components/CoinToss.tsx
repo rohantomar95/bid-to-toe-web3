@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AgentType } from "./AIAgent";
-import { Trophy, Coin } from "lucide-react";
+import { Trophy, Coins } from "lucide-react";
 
 interface CoinTossProps {
   agents: AgentType[];
@@ -77,7 +77,7 @@ const CoinToss: React.FC<CoinTossProps> = ({ agents, onComplete }) => {
     <div className="cyber-panel absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center z-10 bg-slate-900/80 backdrop-blur-sm">
       <div className="max-w-md w-full p-6 flex flex-col items-center">
         <h3 className="cyber-text text-xl mb-4 text-center">
-          <Coin className="h-5 w-5 inline-block mr-2 text-amber-400" />
+          <Coins className="h-5 w-5 inline-block mr-2 text-amber-400" />
           Coin Toss Tie Breaker!
         </h3>
         
