@@ -1,7 +1,8 @@
+
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, BadgeCheck, Trophy } from "lucide-react";
+import { DollarSign, BadgeCheck, Trophy, X, Circle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export type AgentType = {
@@ -55,8 +56,32 @@ const AIAgent = ({
     return "bg-teal-500";
   };
 
+  // Get the background color, icon, and text color based on the agent's mark
+  const getMarkerStyles = () => {
+    if (agent.mark === "X") {
+      return {
+        bgColor: "bg-teal-500",
+        textColor: "text-white",
+        Icon: X
+      };
+    } else {
+      return {
+        bgColor: "bg-amber-500",
+        textColor: "text-white",
+        Icon: Circle
+      };
+    }
+  };
+
+  const { bgColor, textColor, Icon } = getMarkerStyles();
+
   return (
-    <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle} ${winnerStyle}`}>
+    <div className={`cyber-panel flex flex-col items-center p-4 transition-all duration-300 ${bidWinnerStyle} ${winnerStyle} relative`}>
+      {/* Mark indicator in the top-left corner */}
+      <div className={`absolute top-0 left-0 ${bgColor} rounded-br-lg px-2.5 py-1.5 shadow-md flex items-center justify-center z-10`}>
+        <Icon className={`${textColor} w-4 h-4`} strokeWidth={3} />
+      </div>
+
       <div className="relative mb-2">
         <Avatar className={`${isMobile ? 'w-14 h-14' : 'w-20 h-20'} border-2 ${isWinner ? "border-amber-400" : "border-teal-500/50"}`}>
           <img 
