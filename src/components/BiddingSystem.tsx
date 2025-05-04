@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DollarSign, Sparkles } from "lucide-react";
 import { AgentType } from "./AIAgent";
 import { toast } from "sonner";
+import CoinToss from "./CoinToss";
 
 interface BiddingSystemProps {
   agents: AgentType[];
@@ -51,6 +53,7 @@ const BiddingSystem = ({
   const [bids, setBids] = useState<{[key: string]: number | null}>({});
   const [showResults, setShowResults] = useState(false);
   const [tiedBid, setTiedBid] = useState(false);
+  const [showCoinToss, setShowCoinToss] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Waiting for bids...");
 
   // Notify parent component when bidding state changes
@@ -86,6 +89,7 @@ const BiddingSystem = ({
     if (disabled || isBidding) return;
     
     setIsBidding(true);
+    setShowCoinToss(false);
     
     // Show a random message for more interesting commentary
     setStatusMessage(BIDDING_MESSAGES[Math.floor(Math.random() * BIDDING_MESSAGES.length)]);
@@ -105,10 +109,15 @@ const BiddingSystem = ({
       // Check for tied bids
       if (agents.length === 2 && newBids[agents[0].id] === newBids[agents[1].id]) {
         setTiedBid(true);
-        setStatusMessage("Bids are tied! Rebidding required...");
-        toast("Bids are tied! Both agents must rebid.", {
+        setStatusMessage("Bids are tied! Resolving with coin toss...");
+        toast("Bids are tied! Coin toss will decide the winner.", {
           description: "No money will be lost in this tie."
         });
+        
+        // Show coin toss instead of rebidding
+        setTimeout(() => {
+          setShowCoinToss(true);
+        }, 1000);
       } else {
         // Find the winning bid
         const sortedAgents = [...agents].sort((a, b) => {
@@ -128,6 +137,26 @@ const BiddingSystem = ({
       }
     }, 1500); // Simulate thinking delay
   };
+
+  // Handle coin toss completion
+  const handleCoinTossComplete = (winnerId: string) => {
+    const winner = agents.find(agent => agent.id === winnerId);
+    if (winner) {
+      setStatusMessage(`${winner.name} wins the coin toss!`);
+      setTimeout(() => {
+        // Use the tied bid amount (which is the same for both)
+        const winningBid = bids[winner.id] || 0;
+        onBidComplete(winner.id, winningBid);
+        setShowCoinToss(false);
+        setTiedBid(false);
+      }, 500);
+    }
+  };
+
+  // If showing coin toss, render the coin toss component
+  if (showCoinToss) {
+    return <CoinToss agents={agents} onComplete={handleCoinTossComplete} />;
+  }
 
   return (
     <div className="cyber-panel p-6 w-full">
@@ -173,11 +202,11 @@ const BiddingSystem = ({
         <div className="flex justify-center">
           <Button 
             onClick={startBidding} 
-            disabled={isBidding || disabled || (tiedBid && !showResults)}
+            disabled={isBidding || disabled || showCoinToss}
             className={`cyber-button ${isBidding ? 'animate-pulse' : ''}`}
           >
-            {tiedBid && showResults 
-              ? "Rebid (Tied)" 
+            {tiedBid && showResults && !showCoinToss 
+              ? "Start Coin Toss" 
               : showResults 
                 ? "Next Round" 
                 : "Start Bidding Round"}
@@ -185,14 +214,14 @@ const BiddingSystem = ({
         </div>
       )}
       
-      {autoStart && tiedBid && showResults && (
+      {autoStart && tiedBid && showResults && !showCoinToss && (
         <div className="flex justify-center">
           <Button 
-            onClick={startBidding} 
+            onClick={() => setShowCoinToss(true)}
             disabled={isBidding}
             className="cyber-button animate-pulse"
           >
-            Rebid (Tied)
+            Start Coin Toss
           </Button>
         </div>
       )}
